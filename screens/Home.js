@@ -6,6 +6,7 @@ import { Card } from '../components';
 import articles from '../constants/articles';
 const { width } = Dimensions.get('screen');
 
+import { axiosGet } from '../util/restAPI'
 class Home extends React.Component {
   renderArticles = () => {
     return (
@@ -24,6 +25,16 @@ class Home extends React.Component {
       </ScrollView>
     )
   }
+
+  async fetchCustomers() {
+    const customers = await axiosGet('/customers?searchText=&page=1&limit=5')
+    console.log(466666, customers.data)
+    return customers
+  }
+
+  componentDidMount() {
+    this.fetchCustomers()
+  };
 
   render() {
     return (

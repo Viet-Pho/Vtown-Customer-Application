@@ -5,6 +5,7 @@ import { useFonts } from '@use-expo/font';
 import { Asset } from "expo-asset";
 import { Block, GalioProvider } from "galio-framework";
 import { NavigationContainer } from "@react-navigation/native";
+import JWTAuthAuthProvider from "./providers/AuthProvider";
 
 // Before rendering any navigation stack
 import { enableScreens } from "react-native-screens";
@@ -69,9 +70,11 @@ export default props => {
     return (
       <NavigationContainer>
         <GalioProvider theme={argonTheme}>
-          <Block flex>
-            <Screens />
-          </Block>
+          <JWTAuthAuthProvider>
+            <Block flex>
+              <Screens />
+            </Block>
+          </JWTAuthAuthProvider>
         </GalioProvider>
       </NavigationContainer>
     );
