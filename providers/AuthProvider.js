@@ -54,6 +54,7 @@ const JWTAuthAuthProvider = ({ children }) => {
       setAuthToken(token);
 
       const userInfo = await retriveUserInfo();
+      await AsyncStorage.setItem("user", JSON.stringify(userInfo));
 
       if (!userInfo) {
         setJWTAuthData({
