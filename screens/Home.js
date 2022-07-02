@@ -28,12 +28,11 @@ class Home extends React.Component {
 
   async fetchCustomers() {
     const customers = await axiosGet('/customers?searchText=&page=1&limit=5')
-    console.log(466666, customers.data)
     return customers
   }
 
   componentDidMount() {
-    this.fetchCustomers()
+    // this.fetchCustomers()
   };
 
   render() {
