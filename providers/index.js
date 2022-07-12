@@ -3,6 +3,7 @@ import { AsyncStorage } from 'react-native';
 
 const jwtAxios = axios.create({
   baseURL: 'http://admin.vtowns.com.au/api',
+  // baseURL: 'http://localhost:3000/api',
   withCredentials: true,
   headers: {
     'Content-Type': 'application/json',

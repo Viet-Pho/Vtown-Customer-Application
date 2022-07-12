@@ -26,8 +26,8 @@ class Qrcode extends React.Component {
 
   async componentDidMount() {
     const stringUserInfo = await AsyncStorage.getItem("user");
-    const { id, ...rest } = JSON.parse(stringUserInfo);
-    const qrContent = await QRCode.toString(JSON.stringify({ id }));
+    const { id, cardId, ...rest } = JSON.parse(stringUserInfo);
+    const qrContent = await QRCode.toString(JSON.stringify({ cardId }));
     this.setState({ qrContent });
   }
 

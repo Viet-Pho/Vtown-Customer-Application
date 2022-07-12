@@ -1,51 +1,80 @@
-import React from 'react';
-import { StyleSheet } from 'react-native';
-import PropTypes from 'prop-types';
-import ModalDropdown from 'react-native-modal-dropdown';
-import { Block, Text } from 'galio-framework';
+import React from "react";
+import { StyleSheet } from "react-native";
+import PropTypes from "prop-types";
+import ModalDropdown from "react-native-modal-dropdown";
+import { Block, Text } from "galio-framework";
 
-import Icon from './Icon';
-import { argonTheme } from '../constants';
+import Icon from "./Icon";
+import { argonTheme } from "../constants";
 
 class DropDown extends React.Component {
   state = {
-    value: 1,
-  }
+    key: 1,
+    value: "",
+  };
 
-  handleOnSelect = (index, value) => {
+  handleOnSelect = (index, { key, value }) => {
     const { onSelect } = this.props;
 
-    this.setState({ value: value });
-    onSelect && onSelect(index, value);
-  }
+    this.setState({ value, key });
+    onSelect && onSelect(index, value, key);
+  };
 
   render() {
-    const { onSelect, iconName, iconFamily, iconSize, iconColor, color, textStyle, style, ...props } = this.props;
+    const {
+      onSelect,
+      iconName,
+      iconFamily,
+      iconSize,
+      iconColor,
+      color,
+      textStyle,
+      style,
+      dropdownStyle,
+      disabled,
+      options,
+      defaultIndex,
+      ...props
+    } = this.props;
 
     const modalStyles = [
       styles.qty,
       color && { backgroundColor: color },
-      style
+      style,
     ];
 
-    const textStyles = [
-      styles.text,
-      textStyle
-    ];
+    const textStyles = [styles.text, textStyle];
+
+    const dropdownStyles = [styles.dropdown, dropdownStyle];
 
     return (
       <ModalDropdown
+        disabled={disabled}
         style={modalStyles}
+        renderRow={(option) => (
+          <Text style={{ paddingTop: 8, paddingBottom: 8, paddingLeft: 8 }}>
+            {option.value}
+          </Text>
+        )}
         onSelect={this.handleOnSelect}
-        dropdownStyle={styles.dropdown}
-        dropdownTextStyle={{paddingLeft:16, fontSize:12}}
-        {...props}>
+        dropdownStyle={dropdownStyles}
+        options={options}
+        dropdownTextStyle={{ paddingLeft: 16, fontSize: 12 }}
+        {...props}
+      >
         <Block flex row middle space="between">
-          <Text size={12} style={textStyles}>{this.state.value}</Text>
-          <Icon name={iconName || "nav-down"} family={iconFamily || "ArgonExtra"} size={iconSize || 10} color={iconColor || argonTheme.COLORS.WHITE} />
+          <Text size={12} style={textStyles}>
+            {this.state.value || options[defaultIndex].value}
+          </Text>
+          <Icon
+            name={iconName || "nav-down"}
+            family={iconFamily || "ArgonExtra"}
+            size={iconSize || 10}
+            color={iconColor || argonTheme.COLORS.HEADER}
+          />
         </Block>
       </ModalDropdown>
-    )
+    );
   }
 }
 
@@ -64,7 +93,7 @@ const styles = StyleSheet.create({
     backgroundColor: argonTheme.COLORS.DEFAULT,
     paddingHorizontal: 16,
     paddingTop: 10,
-    paddingBottom:9.5,
+    paddingBottom: 9.5,
     borderRadius: 4,
     shadowColor: "rgba(0, 0, 0, 0.1)",
     shadowOffset: { width: 0, height: 2 },
@@ -72,8 +101,8 @@ const styles = StyleSheet.create({
     shadowOpacity: 1,
   },
   text: {
-    color: argonTheme.COLORS.WHITE,
-    fontWeight: '600'
+    color: argonTheme.COLORS.HEADER,
+    fontWeight: "600",
   },
   dropdown: {
     marginTop: 8,
