@@ -5,19 +5,84 @@ import {
   ScrollView,
   Image,
   ImageBackground,
-  Platform
+  Platform,
+  AsyncStorage,
+  DatePickerIOS,
 } from "react-native";
 import { Block, Text, theme } from "galio-framework";
+import DateTimePicker from "@react-native-community/datetimepicker";
+// import { Button, Header, Icon, Input, Select, Switch } from "../components/";
+import { format as formatDate } from "date-fns";
 
-import { Button } from "../components";
+import { Button, Input, Select } from "../components";
 import { Images, argonTheme } from "../constants";
 import { HeaderHeight } from "../constants/utils";
+import { axiosGet, axiosPatch } from "../util/restAPI";
 
 const { width, height } = Dimensions.get("screen");
 
 const thumbMeasure = (width - 48 - 32) / 3;
 
 class Profile extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      customerId: 0,
+      customer: {
+        birthday: new Date(),
+        gender: 0
+      },
+      editable: false,
+      beingChanged: false,
+      backgroundColor: "#d9d9d9",
+    };
+  }
+
+  GenderSelect = React.createRef();
+
+  async componentDidMount() {
+    const { id: customerId } = JSON.parse(await AsyncStorage.getItem("user"));
+    const customer = await axiosGet(`/customers/${customerId}`);
+    // this.GenderSelect.current.select(2);
+    const {avatar, ...shortCus} = customer.data
+    console.log(666666, shortCus)
+    this.setState({
+      customerId,
+      customer:
+        { ...customer.data, birthday: new Date(customer.data.birthday) } || {},
+    });
+  }
+
+  handleChangeCustomer(prop, value) {
+    this.setState({
+      customer: {
+        ...this.state.customer,
+        [prop]: value,
+      },
+      beingChanged: true,
+    });
+  }
+
+  async saveCustomerInfo() {
+    if (!this.state.beingChanged)
+      return this.toggleAllowEditInfo(!this.state.editable);
+
+    const { avatar, totalPoints, ...shortenCustomer } = this.state.customer;
+    await axiosPatch(`/customers/${this.state.customerId}`, {
+      ...shortenCustomer,
+      birthday: formatDate(shortenCustomer.birthday, "yyyy-MM-dd"),
+    });
+    this.toggleAllowEditInfo(!this.state.editable);
+  }
+
+  toggleAllowEditInfo(shouldEditable) {
+    this.setState({
+      editable: shouldEditable,
+      backgroundColor: shouldEditable ? "#ffffff" : "#d9d9d9",
+      beingChanged: false,
+    });
+  }
+
   render() {
     return (
       <Block flex style={styles.profile}>
@@ -29,7 +94,7 @@ class Profile extends React.Component {
           >
             <ScrollView
               showsVerticalScrollIndicator={false}
-              style={{ width, marginTop: '25%' }}
+              style={{ width, marginTop: "25%" }}
             >
               <Block flex style={styles.profileCard}>
                 <Block middle style={styles.avatarContainer}>
@@ -45,12 +110,25 @@ class Profile extends React.Component {
                     space="evenly"
                     style={{ marginTop: 20, paddingBottom: 24 }}
                   >
-                    <Button
-                      small
-                      style={{ backgroundColor: argonTheme.COLORS.INFO }}
-                    >
-                      CONNECT
-                    </Button>
+                    {!this.state.editable ? (
+                      <Button
+                        small
+                        style={{ backgroundColor: argonTheme.COLORS.INFO }}
+                        onPress={() =>
+                          this.toggleAllowEditInfo(!this.state.editable)
+                        }
+                      >
+                        Edit
+                      </Button>
+                    ) : (
+                      <Button
+                        small
+                        style={{ backgroundColor: argonTheme.COLORS.SUCCESS }}
+                        onPress={() => this.saveCustomerInfo()}
+                      >
+                        Save
+                      </Button>
+                    )}
                     <Button
                       small
                       style={{ backgroundColor: argonTheme.COLORS.DEFAULT }}
@@ -58,99 +136,119 @@ class Profile extends React.Component {
                       MESSAGE
                     </Button>
                   </Block>
-                  <Block row space="between">
-                    <Block middle>
-                      <Text
-                        bold
-                        size={18}
-                        color="#525F7F"
-                        style={{ marginBottom: 4 }}
-                      >
-                        2K
-                      </Text>
-                      <Text size={12} color={argonTheme.COLORS.TEXT}>Orders</Text>
+                  <Block flex>
+                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }} flex>
+                      <Text>First Name</Text>
+                      <Input
+                        right
+                        placeholder="First Name"
+                        iconContent={<Block />}
+                        value={this.state.customer.firstName}
+                        style={{ backgroundColor: this.state.backgroundColor }}
+                        editable={this.state.editable}
+                        onChangeText={(value) =>
+                          this.handleChangeCustomer("firstName", value)
+                        }
+                      />
                     </Block>
-                    <Block middle>
-                      <Text
-                        bold
-                        color="#525F7F"
-                        size={18}
-                        style={{ marginBottom: 4 }}
-                      >
-                        10
-                      </Text>
-                      <Text size={12} color={argonTheme.COLORS.TEXT}>Photos</Text>
+                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                      <Text>Last Name</Text>
+                      <Input
+                        right
+                        placeholder="Last Name"
+                        iconContent={<Block />}
+                        value={this.state.customer.lastName}
+                        style={{ backgroundColor: this.state.backgroundColor }}
+                        editable={this.state.editable}
+                        onChangeText={(value) =>
+                          this.handleChangeCustomer("lastName", value)
+                        }
+                      />
                     </Block>
-                    <Block middle>
-                      <Text
-                        bold
-                        color="#525F7F"
-                        size={18}
-                        style={{ marginBottom: 4 }}
-                      >
-                        89
-                      </Text>
-                      <Text size={12} color={argonTheme.COLORS.TEXT}>Comments</Text>
+                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                      <Text>Email</Text>
+                      <Input
+                        right
+                        placeholder="Email"
+                        iconContent={<Block />}
+                        value={this.state.customer.email}
+                        style={{ backgroundColor: "#d9d9d9" }}
+                        editable={false}
+                        onChangeText={(value) =>
+                          this.handleChangeCustomer("email", value)
+                        }
+                      />
                     </Block>
-                  </Block>
-                </Block>
-                <Block flex>
-                  <Block middle style={styles.nameInfo}>
-                    <Text bold size={28} color="#32325D">
-                      Jessica Jones, 27
-                    </Text>
-                    <Text size={16} color="#32325D" style={{ marginTop: 10 }}>
-                      San Francisco, USA
-                    </Text>
-                  </Block>
-                  <Block middle style={{ marginTop: 30, marginBottom: 16 }}>
-                    <Block style={styles.divider} />
-                  </Block>
-                  <Block middle>
-                    <Text
-                      size={16}
-                      color="#525F7F"
-                      style={{ textAlign: "center" }}
-                    >
-                      An artist of considerable range, Jessica name taken by
-                      Melbourne …
-                    </Text>
-                    <Button
-                      color="transparent"
-                      textStyle={{
-                        color: "#233DD2",
-                        fontWeight: "500",
-                        fontSize: 16
-                      }}
-                    >
-                      Show more
-                    </Button>
-                  </Block>
-                  <Block
-                    row
-                    space="between"
-                  >
-                    <Text bold size={16} color="#525F7F" style={{marginTop: 12}}>
-                      Album
-                    </Text>
-                    <Button
-                      small
-                      color="transparent"
-                      textStyle={{ color: "#5E72E4", fontSize: 12, marginLeft: 24 }}
-                    >
-                      View all
-                    </Button>
-                  </Block>
-                  <Block style={{ paddingBottom: -HeaderHeight * 2 }}>
-                    <Block row space="between" style={{ flexWrap: "wrap" }}>
-                      {Images.Viewed.map((img, imgIndex) => (
-                        <Image
-                          source={{ uri: img }}
-                          key={`viewed-${img}`}
-                          resizeMode="cover"
-                          style={styles.thumb}
-                        />
-                      ))}
+                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                      <Text>Phone Number</Text>
+                      <Input
+                        right
+                        type={"numeric"}
+                        placeholder="Phone Number"
+                        iconContent={<Block />}
+                        value={this.state.customer.phoneNumber}
+                        style={{ backgroundColor: this.state.backgroundColor }}
+                        editable={this.state.editable}
+                        onChangeText={(value) =>
+                          this.handleChangeCustomer("phoneNumber", value)
+                        }
+                      />
+                    </Block>
+                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                      <Text>Gender</Text>
+                      <Select
+                        ref={this.GenderSelect}
+                        disabled={!this.state.editable}
+                        dropdownStyle={{ height: 105 }}
+                        style={{ backgroundColor: this.state.backgroundColor }}
+                        defaultIndex={this.state.customer.gender}
+                        renderButtonText={({ title }) => title}
+                        onSelect={(gender) =>
+                          this.handleChangeCustomer("gender", gender)
+                        }
+                        options={[
+                          { key: 0, value: "Male" },
+                          { key: 1, value: "Female" },
+                          { key: 2, value: "Other" },
+                        ]}
+                        editable={this.state.editable}
+                      />
+                    </Block>
+                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                      <Text>Birthday</Text>
+                      {/* <Input
+                        right
+                        type="date"
+                        placeholder="Birthday"
+                        iconContent={<Block />}
+                        value={this.state.customer.birthday}
+                        // onChangeText={(value) =>
+                        //   this.handleChangeCustomer("birthday", value)
+                        // }
+                      /> */}
+                      {/* <DatePickerIOS date={new Date()} /> */}
+                      <DateTimePicker
+                        type="date"
+                        value={this.state.customer.birthday}
+                        editable={this.state.editable}
+                        onChange={(event, date) =>
+                          this.handleChangeCustomer("birthday", date)
+                        }
+                      />
+                    </Block>
+                    <Block style={{ paddingHorizontal: theme.SIZES.BASE }}>
+                      <Text>Address</Text>
+                      <Input
+                        right
+                        placeholder="Address"
+                        iconContent={<Block />}
+                        value={this.state.customer.address}
+                        style={{ backgroundColor: this.state.backgroundColor }}
+                        editable={this.state.editable}
+                        onChangeText={(value) =>
+                          this.handleChangeCustomer("address", value)
+                        }
+                      />
                     </Block>
                   </Block>
                 </Block>
@@ -158,122 +256,6 @@ class Profile extends React.Component {
             </ScrollView>
           </ImageBackground>
         </Block>
-        {/* <ScrollView showsVerticalScrollIndicator={false} 
-                    contentContainerStyle={{ flex: 1, width, height, zIndex: 9000, backgroundColor: 'red' }}>
-        <Block flex style={styles.profileCard}>
-          <Block middle style={styles.avatarContainer}>
-            <Image
-              source={{ uri: Images.ProfilePicture }}
-              style={styles.avatar}
-            />
-          </Block>
-          <Block style={styles.info}>
-            <Block
-              middle
-              row
-              space="evenly"
-              style={{ marginTop: 20, paddingBottom: 24 }}
-            >
-              <Button small style={{ backgroundColor: argonTheme.COLORS.INFO }}>
-                CONNECT
-              </Button>
-              <Button
-                small
-                style={{ backgroundColor: argonTheme.COLORS.DEFAULT }}
-              >
-                MESSAGE
-              </Button>
-            </Block>
-
-            <Block row space="between">
-              <Block middle>
-                <Text
-                  bold
-                  size={12}
-                  color="#525F7F"
-                  style={{ marginBottom: 4 }}
-                >
-                  2K
-                </Text>
-                <Text size={12}>Orders</Text>
-              </Block>
-              <Block middle>
-                <Text bold size={12} style={{ marginBottom: 4 }}>
-                  10
-                </Text>
-                <Text size={12}>Photos</Text>
-              </Block>
-              <Block middle>
-                <Text bold size={12} style={{ marginBottom: 4 }}>
-                  89
-                </Text>
-                <Text size={12}>Comments</Text>
-              </Block>
-            </Block>
-          </Block>
-          <Block flex>
-              <Block middle style={styles.nameInfo}>
-                <Text bold size={28} color="#32325D">
-                  Jessica Jones, 27
-                </Text>
-                <Text size={16} color="#32325D" style={{ marginTop: 10 }}>
-                  San Francisco, USA
-                </Text>
-              </Block>
-              <Block middle style={{ marginTop: 30, marginBottom: 16 }}>
-                <Block style={styles.divider} />
-              </Block>
-              <Block middle>
-                <Text size={16} color="#525F7F" style={{ textAlign: "center" }}>
-                  An artist of considerable range, Jessica name taken by
-                  Melbourne …
-                </Text>
-                <Button
-                  color="transparent"
-                  textStyle={{
-                    color: "#233DD2",
-                    fontWeight: "500",
-                    fontSize: 16
-                  }}
-                >
-                  Show more
-                </Button>
-              </Block>
-              <Block
-                row
-                style={{ paddingVertical: 14, alignItems: "baseline" }}
-              >
-                <Text bold size={16} color="#525F7F">
-                  Album
-                </Text>
-              </Block>
-              <Block
-                row
-                style={{ paddingBottom: 20, justifyContent: "flex-end" }}
-              >
-                <Button
-                  small
-                  color="transparent"
-                  textStyle={{ color: "#5E72E4", fontSize: 12 }}
-                >
-                  View all
-                </Button>
-              </Block>
-              <Block style={{ paddingBottom: -HeaderHeight * 2 }}>
-                <Block row space="between" style={{ flexWrap: "wrap" }}>
-                  {Images.Viewed.map((img, imgIndex) => (
-                    <Image
-                      source={{ uri: img }}
-                      key={`viewed-${img}`}
-                      resizeMode="cover"
-                      style={styles.thumb}
-                    />
-                  ))}
-                </Block>
-              </Block>
-          </Block>
-        </Block>
-                  </ScrollView>*/}
       </Block>
     );
   }
@@ -283,17 +265,17 @@ const styles = StyleSheet.create({
   profile: {
     marginTop: Platform.OS === "android" ? -HeaderHeight : 0,
     // marginBottom: -HeaderHeight * 2,
-    flex: 1
+    flex: 1,
   },
   profileContainer: {
     width: width,
     height: height,
     padding: 0,
-    zIndex: 1
+    zIndex: 1,
   },
   profileBackground: {
     width: width,
-    height: height / 2
+    height: height / 2,
   },
   profileCard: {
     // position: "relative",
@@ -307,36 +289,42 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 0 },
     shadowRadius: 8,
     shadowOpacity: 0.2,
-    zIndex: 2
+    zIndex: 2,
   },
   info: {
-    paddingHorizontal: 40
+    paddingHorizontal: 0,
   },
   avatarContainer: {
     position: "relative",
-    marginTop: -80
+    marginTop: -80,
   },
   avatar: {
     width: 124,
     height: 124,
     borderRadius: 62,
-    borderWidth: 0
+    borderWidth: 0,
   },
   nameInfo: {
-    marginTop: 35
+    marginTop: 35,
   },
   divider: {
     width: "90%",
     borderWidth: 1,
-    borderColor: "#E9ECEF"
+    borderColor: "#E9ECEF",
   },
   thumb: {
     borderRadius: 4,
     marginVertical: 4,
     alignSelf: "center",
     width: thumbMeasure,
-    height: thumbMeasure
-  }
+    height: thumbMeasure,
+  },
+  title: {
+    paddingBottom: theme.SIZES.BASE,
+    paddingHorizontal: theme.SIZES.BASE * 2,
+    marginTop: 44,
+    color: argonTheme.COLORS.HEADER,
+  },
 });
 
 export default Profile;
