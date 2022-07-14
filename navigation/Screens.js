@@ -16,9 +16,13 @@ import Qrcode from "../screens/Qrcode";
 import Profile from "../screens/Profile";
 import React from "react";
 import Register from "../screens/Register";
+import LogIn from "../screens/Login";
+import { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
+import { AsyncStorage } from "react-native";
+import { color } from "react-native-reanimated";
 
 const { width } = Dimensions.get("screen");
 
@@ -222,17 +226,61 @@ export default function OnboardingStack(props) {
       }}
     >
       <Stack.Screen
-        name="Onboarding"
-        component={Onboarding}
+        name="SignUp"
+        component={Register}
         option={{
           headerTransparent: true,
         }}
       />
+      <Stack.Screen
+        name="LogIn"
+        component={LogIn}
+        option={{
+          headerTransparent: true,
+        }}
+      />
+
       <Stack.Screen name="App" component={AppStack} />
     </Stack.Navigator>
   );
 }
 
+function AuthStack(props) {
+  return (
+    <Drawer.Navigator
+      style={{ flex: 1 }}
+      drawerContent={(props) => <CustomDrawerContent {...props} />}
+      drawerStyle={{
+        backgroundColor: "white",
+        width: width * 0.8,
+      }}
+      drawerContentOptions={{
+        activeTintcolor: "white",
+        inactiveTintColor: "#000",
+        activeBackgroundColor: "transparent",
+        itemStyle: {
+          width: width * 0.75,
+          backgroundColor: "transparent",
+          paddingVertical: 16,
+          paddingHorizonal: 12,
+          justifyContent: "center",
+          alignContent: "center",
+          alignItems: "center",
+          overflow: "hidden",
+        },
+        labelStyle: {
+          fontSize: 18,
+          marginLeft: 12,
+          fontWeight: "normal",
+        },
+      }}
+      initialRouteName="Home"
+    >
+      <Drawer.Screen name="SignUp" component={Register} />
+      <Drawer.Screen name="Login" component={LogIn} />
+    </Drawer.Navigator>
+  );
+}
 function AppStack(props) {
   return (
     <Drawer.Navigator
@@ -266,7 +314,6 @@ function AppStack(props) {
     >
       <Drawer.Screen name="Home" component={HomeStack} />
       <Drawer.Screen name="Profile" component={ProfileStack} />
-      <Drawer.Screen name="Account" component={Register} />
       <Drawer.Screen name="Elements" component={ElementsStack} />
       <Drawer.Screen name="Articles" component={ArticlesStack} />
     </Drawer.Navigator>

@@ -1,26 +1,29 @@
 import React from "react";
 import { StyleSheet } from "react-native";
-import PropTypes from 'prop-types';
+import PropTypes from "prop-types";
 
 import { Input } from "galio-framework";
 
-import Icon from './Icon';
+import Icon from "./Icon";
 import { argonTheme } from "../constants";
 
 class ArInput extends React.Component {
   render() {
-    const { shadowless, success, error } = this.props;
+    const { shadowless, success, error, value, type, onChange } = this.props;
 
     const inputStyles = [
       styles.input,
       !shadowless && styles.shadow,
       success && styles.success,
       error && styles.error,
-      {...this.props.style}
+      { ...this.props.style },
     ];
 
     return (
       <Input
+        type={type}
+        value={value}
+        onChangeText={onChange}
         placeholder="write something here"
         placeholderTextColor={argonTheme.COLORS.MUTED}
         style={inputStyles}
@@ -42,21 +45,21 @@ class ArInput extends React.Component {
 ArInput.defaultProps = {
   shadowless: false,
   success: false,
-  error: false
+  error: false,
 };
 
 ArInput.propTypes = {
   shadowless: PropTypes.bool,
   success: PropTypes.bool,
-  error: PropTypes.bool
-}
+  error: PropTypes.bool,
+};
 
 const styles = StyleSheet.create({
   input: {
     borderRadius: 4,
     borderColor: argonTheme.COLORS.BORDER,
     height: 44,
-    backgroundColor: '#FFFFFF'
+    backgroundColor: "#FFFFFF",
   },
   success: {
     borderColor: argonTheme.COLORS.INPUT_SUCCESS,
@@ -70,7 +73,7 @@ const styles = StyleSheet.create({
     shadowRadius: 2,
     shadowOpacity: 0.05,
     elevation: 2,
-  }
+  },
 });
 
 export default ArInput;

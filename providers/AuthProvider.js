@@ -54,7 +54,6 @@ const JWTAuthAuthProvider = ({ children }) => {
       setAuthToken(token);
 
       const userInfo = await retriveUserInfo();
-      await AsyncStorage.setItem("user", JSON.stringify(userInfo));
 
       if (!userInfo) {
         setJWTAuthData({
@@ -65,6 +64,7 @@ const JWTAuthAuthProvider = ({ children }) => {
         return;
       }
       if (userInfo) {
+        await AsyncStorage.setItem("user", JSON.stringify(userInfo));
         setJWTAuthData({
           user: userInfo,
           isLoading: false,
@@ -134,7 +134,7 @@ const JWTAuthAuthProvider = ({ children }) => {
         isAuthenticated: true,
         isLoading: false,
       });
-      //   dispatch(fetchSuccess());
+      return "Sign in Successfully";
     } catch (err) {
       console.log(err.response.data.message);
       setJWTAuthData({
@@ -142,6 +142,7 @@ const JWTAuthAuthProvider = ({ children }) => {
         isAuthenticated: false,
         isLoading: false,
       });
+      return `${err.response.data.message}`;
 
       //   dispatch(fetchError(`Error: ${err?.response?.data?.message}`));
     }
@@ -149,6 +150,7 @@ const JWTAuthAuthProvider = ({ children }) => {
 
   const logout = async () => {
     await AsyncStorage.removeItem("token");
+    await AsyncStorage.removeItem("user");
 
     setAuthToken();
     setJWTAuthData({
