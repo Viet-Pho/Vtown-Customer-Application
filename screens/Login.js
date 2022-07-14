@@ -15,35 +15,19 @@ import { useJWTAuthActions } from "../providers/AuthProvider";
 
 const { width, height } = Dimensions.get("screen");
 
-const Register = (props) => {
+const LogIn = (props) => {
   const { navigation } = props;
-  const { signUpUser } = useJWTAuthActions();
+  const { signInUser } = useJWTAuthActions();
 
   // email, password
   const [email, setEmail] = useState("");
   const [password, setPassWord] = useState("");
 
-  // Register User Param username, email, password, first_name, last_name, age, phone_number, address
-  const [firstName, setFirstName] = useState("");
-  const [userName, setUsername] = useState("");
-
-  const [age, setAge] = useState("");
-
-  const [phoneNumber, setPhoneNumber] = useState("");
-
-  const [address, setAddress] = useState("");
-
-  const handleSubmitRegister = async () => {
-    signUpUser({
-      username: userName,
+  const handleSubmitLogIn = async () => {
+    signInUser({
       email: email,
       password: password,
-      age: parseInt(age),
-      phone_number: phoneNumber,
-      address: address,
-      first_name: firstName,
     });
-
     navigation.navigate("Home");
   };
 
@@ -60,7 +44,7 @@ const Register = (props) => {
               <ScrollView>
                 <Block flex={0.17} middle style={{ marginTop: 20 }}>
                   <Text color="#8898AA" size={12}>
-                    Register Your Account
+                    Log In to existing account
                   </Text>
                 </Block>
                 <Block flex center>
@@ -104,116 +88,27 @@ const Register = (props) => {
                         }
                       />
                     </Block>
-                    <Block width={width * 0.8}>
-                      <Input
-                        value={firstName}
-                        onChange={(e) => setFirstName(e)}
-                        borderless
-                        placeholder="First Name"
-                        iconContent={
-                          <Icon
-                            size={16}
-                            color={argonTheme.COLORS.ICON}
-                            name="info-with-circle"
-                            family="Entypo"
-                            style={styles.inputIcons}
-                          />
-                        }
-                      />
-                    </Block>
-                    <Block width={width * 0.8}>
-                      <Input
-                        value={userName}
-                        onChange={(e) => setUsername(e)}
-                        borderless
-                        placeholder="Username"
-                        iconContent={
-                          <Icon
-                            size={16}
-                            color={argonTheme.COLORS.ICON}
-                            name="info-with-circle"
-                            family="Entypo"
-                            style={styles.inputIcons}
-                          />
-                        }
-                      />
-                    </Block>
 
-                    <Block width={width * 0.8}>
-                      <Input
-                        value={age}
-                        onChange={(e) => setAge(e)}
-                        borderless
-                        placeholder="Age"
-                        iconContent={
-                          <Icon
-                            size={16}
-                            color={argonTheme.COLORS.ICON}
-                            name="calendar"
-                            family="Entypo"
-                            style={styles.inputIcons}
-                          />
-                        }
-                      />
-                    </Block>
-                    <Block width={width * 0.8}>
-                      <Input
-                        value={phoneNumber}
-                        onChange={(e) => setPhoneNumber(e)}
-                        type="phone-pad"
-                        borderless
-                        number
-                        placeholder="Phone Number"
-                        iconContent={
-                          <Icon
-                            size={16}
-                            color={argonTheme.COLORS.ICON}
-                            name="phone"
-                            family="Entypo"
-                            style={styles.inputIcons}
-                          />
-                        }
-                      />
-                    </Block>
-                    <Block width={width * 0.8}>
-                      <Input
-                        value={address}
-                        onChange={(e) => setAddress(e)}
-                        borderless
-                        placeholder="Address"
-                        iconContent={
-                          <Icon
-                            size={16}
-                            color={argonTheme.COLORS.ICON}
-                            name="address"
-                            family="Entypo"
-                            style={styles.inputIcons}
-                          />
-                        }
-                      />
-                    </Block>
                     <Block row style={{ marginLeft: 5, marginTop: 10 }}>
                       <Text size={12} color={argonTheme.COLORS.MUTED}>
-                        Already have Account?
+                        Don't have account yet?
                       </Text>
                       <Text
                         size={12}
                         style={{ color: "blue", marginLeft: 10, marginTop: 1 }}
-                        onPress={() => navigation.navigate("LogIn")}
+                        onPress={() => navigation.navigate("SignUp")}
                       >
-                        Sign In
+                        Register
                       </Text>
                     </Block>
                     <Block middle>
                       <Button
-                        onPress={() => {
-                          handleSubmitRegister();
-                        }}
+                        onPress={handleSubmitLogIn}
                         color="primary"
                         style={styles.createButton}
                       >
                         <Text bold size={14} color={argonTheme.COLORS.WHITE}>
-                          CREATE ACCOUNT
+                          Log In
                         </Text>
                       </Button>
                     </Block>
@@ -281,4 +176,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default Register;
+export default LogIn;
