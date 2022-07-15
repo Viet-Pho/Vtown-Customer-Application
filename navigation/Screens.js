@@ -17,12 +17,13 @@ import Profile from "../screens/Profile";
 import React from "react";
 import Register from "../screens/Register";
 import LogIn from "../screens/Login";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { createDrawerNavigator } from "@react-navigation/drawer";
 import { createStackNavigator } from "@react-navigation/stack";
 import { AsyncStorage } from "react-native";
-import { color } from "react-native-reanimated";
+
+import { useJWTAuth, useJWTAuthActions } from "../providers/AuthProvider";
 
 const { width } = Dimensions.get("screen");
 
@@ -218,6 +219,9 @@ function HomeStack(props) {
 }
 
 export default function OnboardingStack(props) {
+  const { isAuthenticated } = useJWTAuth();
+
+  console.log("Authenticated", isAuthenticated);
   return (
     <Stack.Navigator
       screenOptions={{
@@ -225,22 +229,26 @@ export default function OnboardingStack(props) {
         headerShown: false,
       }}
     >
-      <Stack.Screen
-        name="SignUp"
-        component={Register}
-        option={{
-          headerTransparent: true,
-        }}
-      />
-      <Stack.Screen
-        name="LogIn"
-        component={LogIn}
-        option={{
-          headerTransparent: true,
-        }}
-      />
-
-      <Stack.Screen name="App" component={AppStack} />
+      {isAuthenticated ? (
+        <Stack.Screen name="App" component={AppStack} />
+      ) : (
+        <>
+          <Stack.Screen
+            name="SignUp"
+            component={Register}
+            option={{
+              headerTransparent: true,
+            }}
+          />
+          <Stack.Screen
+            name="LogIn"
+            component={LogIn}
+            option={{
+              headerTransparent: true,
+            }}
+          />
+        </>
+      )}
     </Stack.Navigator>
   );
 }

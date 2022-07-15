@@ -1,11 +1,12 @@
-import React, {useState} from "react";
+import React, { useState, useEffect } from "react";
 import { Image } from "react-native";
 import AppLoading from "expo-app-loading";
-import { useFonts } from '@use-expo/font';
+import { useFonts } from "@use-expo/font";
 import { Asset } from "expo-asset";
 import { Block, GalioProvider } from "galio-framework";
 import { NavigationContainer } from "@react-navigation/native";
 import JWTAuthAuthProvider from "./providers/AuthProvider";
+import { AsyncStorage } from "react-native";
 
 // Before rendering any navigation stack
 import { enableScreens } from "react-native-screens";
@@ -22,14 +23,14 @@ const assetImages = [
   Images.Pro,
   Images.ArgonLogo,
   Images.iOSLogo,
-  Images.androidLogo
+  Images.androidLogo,
 ];
 
 // cache product images
-articles.map(article => assetImages.push(article.image));
+articles.map((article) => assetImages.push(article.image));
 
 function cacheImages(images) {
-  return images.map(image => {
+  return images.map((image) => {
     if (typeof image === "string") {
       return Image.prefetch(image);
     } else {
@@ -38,10 +39,10 @@ function cacheImages(images) {
   });
 }
 
-export default props => {
+export default (props) => {
   const [isLoadingComplete, setLoading] = useState(false);
   let [fontsLoaded] = useFonts({
-    'ArgonExtra': require('./assets/font/argon.ttf'),
+    ArgonExtra: require("./assets/font/argon.ttf"),
   });
 
   function _loadResourcesAsync() {
@@ -52,13 +53,13 @@ export default props => {
     // In this case, you might want to report the error to your error
     // reporting service, for example Sentry
     console.warn(error);
-  };
+  }
 
- function _handleFinishLoading() {
+  function _handleFinishLoading() {
     setLoading(true);
-  };
+  }
 
-  if(!fontsLoaded && !isLoadingComplete) {
+  if (!fontsLoaded && !isLoadingComplete) {
     return (
       <AppLoading
         startAsync={_loadResourcesAsync}
@@ -66,7 +67,7 @@ export default props => {
         onFinish={_handleFinishLoading}
       />
     );
-  } else if(fontsLoaded) {
+  } else if (fontsLoaded) {
     return (
       <NavigationContainer>
         <GalioProvider theme={argonTheme}>
@@ -79,9 +80,9 @@ export default props => {
       </NavigationContainer>
     );
   } else {
-    return null
+    return null;
   }
-}
+};
 
 // export default class App extends React.Component {
 //   state = {
