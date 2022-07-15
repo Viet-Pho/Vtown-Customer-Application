@@ -12,6 +12,7 @@ import { Block, Checkbox, Text, theme, Toast } from "galio-framework";
 import { Button, Icon, Input } from "../components";
 import { Images, argonTheme } from "../constants";
 import { useJWTAuthActions } from "../providers/AuthProvider";
+import { Linking } from "react-native";
 
 const { width, height } = Dimensions.get("screen");
 
@@ -28,7 +29,6 @@ const LogIn = (props) => {
       email: email,
       password: password,
     });
-    navigation.navigate("Home");
   };
 
   return (
@@ -99,6 +99,22 @@ const LogIn = (props) => {
                         onPress={() => navigation.navigate("SignUp")}
                       >
                         Register
+                      </Text>
+                    </Block>
+                    <Block row style={{ marginLeft: 5, marginTop: 10 }}>
+                      <Text size={12} color={argonTheme.COLORS.MUTED}>
+                        Forget your password?
+                      </Text>
+                      <Text
+                        size={12}
+                        style={{ color: "blue", marginLeft: 10, marginTop: 1 }}
+                        onPress={() =>
+                          Linking.openURL(
+                            "https://admin.vtowns.com.au/forget-password"
+                          )
+                        }
+                      >
+                        Reset Password
                       </Text>
                     </Block>
                     <Block middle>

@@ -68,7 +68,6 @@ const LogOutButton = ({ isWhite, style, navigation }) => {
       style={[styles.button, style]}
       onPress={() => {
         logout();
-        navigation.navigate("LogIn");
       }}
     >
       <Icon

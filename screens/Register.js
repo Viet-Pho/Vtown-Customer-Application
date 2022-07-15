@@ -43,8 +43,6 @@ const Register = (props) => {
       address: address,
       first_name: firstName,
     });
-
-    navigation.navigate("Home");
   };
 
   return (
