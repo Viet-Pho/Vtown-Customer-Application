@@ -7,12 +7,12 @@ import {
   Dimensions,
 } from "react-native";
 import { Button, Block, NavBar, Text, theme } from "galio-framework";
-
 import Icon from "./Icon";
 import Input from "./Input";
 import Tabs from "./Tabs";
 import argonTheme from "../constants/Theme";
 import { useJWTAuthActions } from "../providers/AuthProvider";
+import { useProfileActions } from "../providers/ProfileProvider";
 
 const { height, width } = Dimensions.get("window");
 const iPhoneX = () =>
@@ -80,6 +80,20 @@ const LogOutButton = ({ isWhite, style, navigation }) => {
   );
 };
 
+const SaveText = ({ navigation }) => {
+  const { updateProfileInfo } = useProfileActions();
+  return (
+    <TouchableOpacity
+      onPress={async () => {
+        await updateProfileInfo();
+        navigation.navigate("Profile");
+      }}
+    >
+      <Text color={argonTheme.COLORS.WHITE}>Save</Text>
+    </TouchableOpacity>
+  );
+};
+
 const SearchButton = ({ isWhite, style, navigation }) => (
   <TouchableOpacity
     style={[styles.button, style]}
@@ -89,6 +103,17 @@ const SearchButton = ({ isWhite, style, navigation }) => (
       size={16}
       family="Galio"
       name="search-zoom-in"
+      color={theme.COLORS[isWhite ? "WHITE" : "ICON"]}
+    />
+  </TouchableOpacity>
+);
+
+const MoreButton = ({ isWhite }) => (
+  <TouchableOpacity>
+    <Icon
+      size={22}
+      family="Feather"
+      name="more-horizontal"
       color={theme.COLORS[isWhite ? "WHITE" : "ICON"]}
     />
   </TouchableOpacity>
@@ -155,14 +180,11 @@ class Header extends React.Component {
           />,
         ];
       case "Profile":
+        return [];
+      case "QR Code":
         return [
-          <BellButton
-            key="chat-profile"
-            navigation={navigation}
-            isWhite={white}
-          />,
-          <BasketButton
-            key="basket-deals"
+          <MoreButton
+            key="more-info"
             navigation={navigation}
             isWhite={white}
           />,
@@ -205,6 +227,22 @@ class Header extends React.Component {
             navigation={navigation}
             isWhite={white}
           />,
+        ];
+      case "Personal Info":
+        return [
+          <SaveText
+            key="save"
+            navigation={navigation}
+            isWhite={white}
+          ></SaveText>,
+        ];
+      case "Contact Info":
+        return [
+          <SaveText
+            key="save"
+            navigation={navigation}
+            isWhite={white}
+          ></SaveText>,
         ];
       default:
         break;
@@ -338,7 +376,7 @@ class Header extends React.Component {
           style={navbarStyles}
           transparent={transparent}
           right={this.renderRight()}
-          rightStyle={{ alignItems: "center" }}
+          rightStyle={{ alignItems: "flex-end" }}
           left={
             <Icon
               name={back ? "chevron-left" : "menu"}
