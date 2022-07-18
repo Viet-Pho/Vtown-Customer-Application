@@ -6,7 +6,7 @@ import { Asset } from "expo-asset";
 import { Block, GalioProvider } from "galio-framework";
 import { NavigationContainer } from "@react-navigation/native";
 import JWTAuthAuthProvider from "./providers/AuthProvider";
-import { AsyncStorage } from "react-native";
+import ProfileProvider from "./providers/ProfileProvider";
 
 // Before rendering any navigation stack
 import { enableScreens } from "react-native-screens";
@@ -72,9 +72,11 @@ export default (props) => {
       <NavigationContainer>
         <GalioProvider theme={argonTheme}>
           <JWTAuthAuthProvider>
-            <Block flex>
-              <Screens />
-            </Block>
+            <ProfileProvider>
+              <Block flex>
+                <Screens />
+              </Block>
+            </ProfileProvider>
           </JWTAuthAuthProvider>
         </GalioProvider>
       </NavigationContainer>

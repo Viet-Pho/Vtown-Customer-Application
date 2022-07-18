@@ -14,6 +14,8 @@ import Onboarding from "../screens/Onboarding";
 import Pro from "../screens/Pro";
 import Qrcode from "../screens/Qrcode";
 import Profile from "../screens/Profile";
+import ContactInfo from "../screens/Profile/ContactInfo";
+import PersonalInfo from "../screens/Profile/PersonalInfo";
 import React from "react";
 import Register from "../screens/Register";
 import LogIn from "../screens/Login";
@@ -136,19 +138,38 @@ function ProfileStack(props) {
         }}
       />
       <Stack.Screen
-        name="Pro"
-        component={Pro}
+        name="PersonalInfo"
+        component={PersonalInfo}
         options={{
           header: ({ navigation, scene }) => (
             <Header
-              title=""
-              back
-              white
               transparent
+              white
+              back
+              title="Personal Info"
               navigation={navigation}
               scene={scene}
             />
           ),
+          cardStyle: { backgroundColor: "#FFFFFF" },
+          headerTransparent: true,
+        }}
+      />
+      <Stack.Screen
+        name="ContactInfo"
+        component={ContactInfo}
+        options={{
+          header: ({ navigation, scene }) => (
+            <Header
+              transparent
+              back
+              white
+              title="Contact Info"
+              navigation={navigation}
+              scene={scene}
+            />
+          ),
+          cardStyle: { backgroundColor: "#FFFFFF" },
           headerTransparent: true,
         }}
       />
@@ -203,7 +224,7 @@ function HomeStack(props) {
         options={{
           header: ({ navigation, scene }) => (
             <Header
-              title=""
+              title="QR Code"
               back
               white
               transparent

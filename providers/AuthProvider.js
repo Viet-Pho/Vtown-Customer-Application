@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import jwtAxios, { setAuthToken } from "./index";
 import { AsyncStorage } from "react-native";
+import { axiosGet, axiosPatch } from "../util/restAPI";
 
 const JWTAuthContext = createContext({
   user: null,
@@ -42,7 +43,7 @@ const JWTAuthAuthProvider = ({ children }) => {
     const getAuthUser = async () => {
       let token = await AsyncStorage.getItem("token");
       // override token when login feature not implement yet
-      if (!token) token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoibnFocHRpdEBnbWFpbC5jb20iLCJyb2xlIjoxLCJ1c2VybmFtZSI6Im5xaHB0aXQxIiwiY29uZmlybWVkIjoxLCJpYXQiOjE2NTcwNzE1NjAsImV4cCI6MTY1OTY2MzU2MH0.PngDhiwG0pW2MSX1aP7i5mNq5_K3u8Jn44on3eghA3k'
+      // if (!token) token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoibnFocHRpdEBnbWFpbC5jb20iLCJyb2xlIjoxLCJ1c2VybmFtZSI6Im5xaHB0aXQxIiwiY29uZmlybWVkIjoxLCJpYXQiOjE2NTcwNzE1NjAsImV4cCI6MTY1OTY2MzU2MH0.PngDhiwG0pW2MSX1aP7i5mNq5_K3u8Jn44on3eghA3k'
 
       // local
       // await AsyncStorage.setItem("token",'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MTMsImVtYWlsIjoibnFocHRpdEBnbWFpbC5jb20iLCJyb2xlIjoxLCJ1c2VybmFtZSI6Im5xaHB0aXQxIiwiY29uZmlybWVkIjoxLCJpYXQiOjE2NTcwNzI4NjQsImV4cCI6MTY1OTY2NDg2NH0.3ZPFISAhJBrLwzkEaZe9GtZmJZc-EGq5LEC_o2D30PE');

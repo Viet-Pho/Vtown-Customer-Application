@@ -1,5 +1,7 @@
 // local imgs
 const Onboarding = require("../assets/imgs/bg.png");
+const BackGround = require("../assets/imgs/image-bg.png");
+const VtownLogo = require("../assets/imgs/vtown-logo.png");
 const Logo = require("../assets/imgs/argon-logo.png");
 const LogoOnboarding = require("../assets/imgs/argon-logo-onboarding.png");
 const ProfileBackground = require("../assets/imgs/profile-screen-bg.png");
@@ -27,6 +29,8 @@ const Products = {
 
 export default {
   Onboarding,
+  BackGround,
+  VtownLogo,
   Logo,
   LogoOnboarding,
   ProfileBackground,
