@@ -18,8 +18,7 @@ import { Images, argonTheme } from "../constants";
 import { HeaderHeight } from "../constants/utils";
 import { axiosGet } from "../util/restAPI";
 import { useProfileActions } from "../providers/ProfileProvider";
-import { useJWTAuth } from "../providers/AuthProvider";
-// import { launchImageLibrary } from "react-native-image-picker";
+import { useJWTAuth, useJWTAuthActions } from "../providers/AuthProvider";
 import * as ImagePicker from "expo-image-picker";
 import { getFileInfo, isLessThanTheMB } from "../util/fileHelpers";
 
@@ -65,6 +64,7 @@ const Profile = ({ navigation }) => {
   const [showErrorLimitFile, setShowErrorLimitFile] = useState(false);
 
   const { user: userInfo } = useJWTAuth();
+  const { logout } = useJWTAuthActions();
   const {
     setProfile: setHookProfile,
     updateProfileInfo,
@@ -75,10 +75,10 @@ const Profile = ({ navigation }) => {
     React.useCallback(() => {
       const fetchUser = async () => {
         const { data: userProfile } = await axiosGet(
-          `/customers/${userInfo.id}`
+          `/customers/${userInfo.userId}`
         );
         setProfile(userProfile);
-        initProfile(userInfo.id, userProfile);
+        initProfile(userInfo.userId, userProfile);
       };
 
       fetchUser();
@@ -160,7 +160,11 @@ const Profile = ({ navigation }) => {
               <Block middle style={styles.avatarContainer}>
                 <TouchableOpacity onPress={selectImage}>
                   <Image
-                    source={{ uri: profile.avatar || "" }}
+                    source={
+                      profile.avatar
+                        ? { uri: profile.avatar || "" }
+                        : Images.VtownLogo
+                    }
                     style={styles.avatar}
                   />
                 </TouchableOpacity>
@@ -178,13 +182,17 @@ const Profile = ({ navigation }) => {
                   >
                     {profile.firstName} {profile.lastName}
                   </Text>
-                  <VerifiedNotification confirmed={!!userInfo.confirmed} />
+                  <VerifiedNotification
+                    confirmed={
+                      userInfo && userInfo.confirmed && !!userInfo.confirmed
+                    }
+                  />
                 </Block>
                 <InputCard
                   title={"Personal Info"}
                   onPressAction={() =>
                     navigation.navigate("PersonalInfo", {
-                      customerId: userInfo.id,
+                      customerId: userInfo.userId,
                       profile,
                     })
                   }
@@ -219,7 +227,7 @@ const Profile = ({ navigation }) => {
                   title={"Contact Info"}
                   onPressAction={() =>
                     navigation.navigate("ContactInfo", {
-                      customerId: userInfo.id,
+                      customerId: userInfo.userId,
                       profile,
                     })
                   }
@@ -252,9 +260,7 @@ const Profile = ({ navigation }) => {
                     iconName="power"
                     iconFamily="Feather"
                     value={"Log out"}
-                    onPress={() => {
-                      console.log("You are Logged out");
-                    }}
+                    onPress={logout}
                   ></Line>
                 </InputCard>
               </Block>

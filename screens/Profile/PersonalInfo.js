@@ -1,14 +1,14 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import {
   StyleSheet,
   Dimensions,
   ScrollView,
   ImageBackground,
-  Platform,
+  Platform
 } from "react-native";
 import { Block, theme } from "galio-framework";
 import { format as formatDate } from "date-fns";
-import { Input, Select, Icon } from "../../components";
+import { Input, Select, Icon, CustomDatepicker } from "../../components";
 import { Images, argonTheme } from "../../constants";
 import { HeaderHeight } from "../../constants/utils";
 import { useProfile, useProfileActions } from "../../providers/ProfileProvider";
@@ -74,26 +74,27 @@ const PersonalInfo = ({ route: { params } }) => {
                   iconSize={14}
                   onChangeText={(value) => setProfile("lastName", value)}
                 />
-                <Input
-                  placeholder="Birthday"
-                  iconContent={
+                <Block row flex center style={styles.line}>
+                  <Block flex={0.1} style={{ marginLeft: 15 }}>
                     <Icon
+                      flex={0.1}
                       size={14}
                       color={argonTheme.COLORS.ICON}
-                      style={{ marginRight: 10 }}
                       name="cake"
                       family="MaterialIcons"
                     />
-                  }
-                  style={{ backgroundColor: argonTheme.COLORS.INPUT }}
-                  editable={false}
-                  value={formatDate(
-                    new Date(profileInfo.birthday),
-                    "dd/MM/yyyy"
-                  )}
-                  iconSize={14}
-                />
-                <Block row flex center>
+                  </Block>
+                  <Block flex={0.9}>
+                    <CustomDatepicker
+                      date={profileInfo.birthday}
+                      onDateChage={(date) => setProfile("birthday", date)}
+                      defaultDate={profileInfo.birthday}
+                      textStyle={{ paddingTop: 8, paddingBottom: 8, color: argonTheme.COLORS.HEADER }}
+                    />
+                  </Block>
+                </Block>
+
+                <Block row flex center style={styles.line}>
                   <Block flex={0.1} style={{ marginLeft: 15 }}>
                     <Icon
                       flex={0.1}
@@ -151,6 +152,14 @@ const styles = StyleSheet.create({
   },
   info: {
     paddingHorizontal: 0,
+  },
+  line: {
+    marginTop: 10,
+    paddingTop: 5,
+    paddingBottom: 5,
+    borderRadius: 5,
+    borderWidth: 1,
+    borderColor: theme.COLORS.GREY,
   },
 });
 

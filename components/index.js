@@ -8,6 +8,7 @@ import Switch from './Switch';
 import Select from './Select';
 import InputCard from './InputCard';
 import Line from './Line';
+import CustomDatepicker from './CustomDatepicker';
 
 export {
   Button,
@@ -19,5 +20,6 @@ export {
   Switch, 
   Select,
   InputCard,
-  Line
+  Line,
+  CustomDatepicker
 };
