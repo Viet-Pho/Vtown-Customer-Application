@@ -9,6 +9,7 @@ import {
   ImageBackground,
   Platform,
   TouchableOpacity,
+  RefreshControl,
 } from "react-native";
 import { Block, Text, theme, Toast } from "galio-framework";
 import { format as formatDate } from "date-fns";
@@ -16,7 +17,7 @@ import { format as formatDate } from "date-fns";
 import { InputCard, Icon, Line } from "../components";
 import { Images, argonTheme } from "../constants";
 import { HeaderHeight } from "../constants/utils";
-import { axiosGet } from "../util/restAPI";
+import { axiosGet, axiosPost } from "../util/restAPI";
 import { useProfileActions } from "../providers/ProfileProvider";
 import { useJWTAuth, useJWTAuthActions } from "../providers/AuthProvider";
 import * as ImagePicker from "expo-image-picker";
@@ -32,7 +33,7 @@ const genderOptions = [
   { key: 2, value: "Other" },
 ];
 
-const VerifiedNotification = ({ confirmed }) => (
+const VerifiedNotification = ({ confirmed, onRequestVerify }) => (
   <Block
     row
     middle
@@ -52,7 +53,12 @@ const VerifiedNotification = ({ confirmed }) => (
       style={{ paddingRight: 8 }}
       color={argonTheme.COLORS.WHITE}
     />
-    <Text size={12} style={styles.tabTitle} color={argonTheme.COLORS.WHITE}>
+    <Text
+      size={12}
+      style={styles.tabTitle}
+      color={argonTheme.COLORS.WHITE}
+      onPress={!!confirmed ? null : onRequestVerify}
+    >
       {!!confirmed ? "Verified" : "Not verified"}
     </Text>
   </Block>
@@ -62,25 +68,47 @@ const Profile = ({ navigation }) => {
   const [profile, setProfile] = useState({ birthday: new Date(), gender: 0 });
   const [showUploadSuccess, setShowUploadSuccess] = useState(false);
   const [showErrorLimitFile, setShowErrorLimitFile] = useState(false);
+  const [showRequestVerify, setShowRequestVerify] = useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   const { user: userInfo } = useJWTAuth();
-  const { logout } = useJWTAuthActions();
+  const { logout, refreshUserInfo } = useJWTAuthActions();
   const {
     setProfile: setHookProfile,
     updateProfileInfo,
     initProfile,
   } = useProfileActions();
 
+  const onRefresh = async () => {
+    setRefreshing(true);
+    try {
+      await refreshUserInfo();
+      setTimeout(() => {
+        setRefreshing(false);
+      }, 1000);
+    } catch (e) {
+      setRefreshing(false);
+    }
+  };
+
+  const fetchUser = async () => {
+    const { data: userProfile } = await axiosGet(
+      `/customers/${userInfo.userId}`
+    );
+    setProfile(userProfile);
+    initProfile(userInfo.userId, userProfile);
+  };
+
+  const onRequestVerify = async () => {
+    await axiosPost('send-verify-email', { email: userInfo.email });
+    setShowRequestVerify(true);
+      setTimeout(() => {
+        setShowRequestVerify(false);
+      }, 2000);
+  }
+
   useFocusEffect(
     React.useCallback(() => {
-      const fetchUser = async () => {
-        const { data: userProfile } = await axiosGet(
-          `/customers/${userInfo.userId}`
-        );
-        setProfile(userProfile);
-        initProfile(userInfo.userId, userProfile);
-      };
-
       fetchUser();
     }, [])
   );
@@ -146,6 +174,16 @@ const Profile = ({ navigation }) => {
       >
         Upload avatar successfully.
       </Toast>
+      <Toast
+        isShow={showRequestVerify}
+        color="success"
+        fadeInDuration={500}
+        fadeOutDuration={500}
+        positionIndicator="bottom"
+        positionOffset={48}
+      >
+        We sent a verify email to you. Please check your email. 
+      </Toast>
       <Block flex>
         <ImageBackground
           source={Images.ProfileBackground}
@@ -155,6 +193,9 @@ const Profile = ({ navigation }) => {
           <ScrollView
             showsVerticalScrollIndicator={false}
             style={{ width, marginTop: "25%" }}
+            refreshControl={
+              <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+            }
           >
             <Block flex style={styles.profileCard}>
               <Block middle style={styles.avatarContainer}>
@@ -186,6 +227,7 @@ const Profile = ({ navigation }) => {
                     confirmed={
                       userInfo && userInfo.confirmed && !!userInfo.confirmed
                     }
+                    onRequestVerify={onRequestVerify}
                   />
                 </Block>
                 <InputCard

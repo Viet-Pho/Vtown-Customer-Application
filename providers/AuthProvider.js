@@ -166,6 +166,17 @@ const JWTAuthAuthProvider = ({ children }) => {
     });
   };
 
+  const refreshUserInfo = async () => {
+    const userInfo = await retriveUserInfo();
+
+    setJWTAuthData({
+      user: userInfo,
+      isLoading: false,
+      isAuthenticated: true,
+    });
+    return;
+  };
+
   return (
     <JWTAuthContext.Provider
       value={{
@@ -177,6 +188,7 @@ const JWTAuthAuthProvider = ({ children }) => {
           signUpUser,
           signInUser,
           logout,
+          refreshUserInfo
         }}
       >
         {children}
